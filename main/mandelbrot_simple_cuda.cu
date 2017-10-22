@@ -6,23 +6,23 @@
  */
 
 #include <string>
+#include <math.h>
+#include <stdio.h>
 
 #include "image_magick.h"
 
 // CUDA kernel
 __global__
-void mandelsequence(int* escIter,double* w, double* h){
-	int I = 10000;
-	double Cscale = 0.0025;		// 2/800  --  complex scale per calc unit
-	double Cr = -0.5 + *w * Cscale;
-	double Ci = *h * Cscale;
+void mandelsequence(int* escIter,float* w, float* h, int I, float Cscale){
+	float Cr = -0.5 + *w * Cscale;
+	float Ci = *h * Cscale;
 
-	double Zr;
-	double Zi;
-	double Zr2;
-	double Zi2;
+	float Zr;
+	float Zi;
+	float Zr2;
+	float Zi2;
 
-	double escThresh = 4.0;
+	float escThresh = 4.0;
 
 	Zr = 0;
 	Zi = 0;
@@ -49,20 +49,37 @@ void mandelsequence(int* escIter,double* w, double* h){
 	return;
 }
 
-int run(){
-	int width = 800;
-	int height = 600;
+//	void exportImage(int width, int height, int* data, int iterations, std::string path){
+//		FILE* fptr;
+//		char* file = new char[128];
+//		sprintf(file,"%s",path.c_str());
+//		fptr = fopen(file,"wb");
+//		char col;
+//		for (int i=0; i<height*width; i++){
+//			col = char(round(data[i]/(float)iterations * 255));
+//			fwrite(&col,1,1,fptr);
+//		}
+//		fclose(fptr);
+//	}
+
+int main(){
+	int width = 8;
+	int height = 6;
 	std::string path = "/home/robert/Fractalbrot/test/test.png";
+	float Cscale = 0.0025;	// 2:800  -- scale for complex plane
+	int iterations = 1000;
 
-
-	//int data [width*height];
-	int* data;
-	double* W,* H;
-	int* iter;
-	cudaMalloc(&data, width*height*sizeof(int));
-	cudaMalloc(&W, width*height*sizeof(float));
-	cudaMalloc(&H, width*height*sizeof(float));
-	cudaMalloc(&iter, width*height*sizeof(int));
+	int* data, * data_g;
+	float* W,* W_g;
+	float* H,* H_g;
+	
+	data = (int*)malloc(width*height*sizeof(int));
+	W = (float*)malloc(width*height*sizeof(float));
+	H = (float*)malloc(width*height*sizeof(float));
+	
+	cudaMalloc(&data_g, width*height*sizeof(int));
+	cudaMalloc(&W_g, width*height*sizeof(float));
+	cudaMalloc(&H_g, width*height*sizeof(float));
 
 	for (int h=0; h<height; h++){
 		for (int w=0; w<width; w++){
@@ -70,21 +87,23 @@ int run(){
 			H[h*width+w] = h-height/2;
 		}
 	}
-	mandelsequence<<<1, 1>>>(iter,W,H);
-
-	cudaDeviceSynchronize();
 	
-	exportImage(width,height,data,10000,path);
+	cudaMemcpy(W_g, W, width*height*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(H_g, H, width*height*sizeof(float), cudaMemcpyHostToDevice);
+    
+	mandelsequence<<<1, 1>>>(data,W,H,iterations,Cscale);
 
-	cudaFree(data);
-	cudaFree(W);
-	cudaFree(H);
-	cudaFree(iter);
+	cudaMemcpy(data, data_g, width*height*sizeof(float), cudaMemcpyDeviceToHost);
+	
+	exportImage(width,height,data,iterations,path);
+
+	cudaFree(data_g);
+	cudaFree(W_g);
+	cudaFree(H_g);
+	free(data);
+	free(W);
+	free(H);
 
 	printf("done\n");
 	return 0;
-}
-
-int main(){
-	return run();
 }
