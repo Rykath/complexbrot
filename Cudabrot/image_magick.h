@@ -1,6 +1,4 @@
 /*
- * image_magick.h
- *
  *  Created on: Oct 20, 2017
  *      Author: Rykath
  */

@@ -23,7 +23,7 @@ void exportImage(int width, int height, int* data, int iterations, std::string p
 
 	for (int h=0; h<height; h++){
 		for (int w=0; w<width; w++){
-			int gray = round((float)data[h*width+w]/iterations * MaxRGB);
+			int gray = round(log((float)data[h*width+w])/log(iterations) * MaxRGB);
 			Color color = Color(gray,gray,gray,0);
 
 			*(pixp+h*width+w) = color;

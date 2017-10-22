@@ -1,11 +1,10 @@
 /*
- * mandelbrot_simple.cpp
- *
  *  Created on: Oct 20, 2017
  *      Author: Rykath
  */
 
 #include <string>
+#include <stdio.h>
 
 #include "image_magick.h"
 
@@ -39,17 +38,17 @@ int mandelsequence(double Cr, double Ci, double Kr, double Ki, double I){
 	return I;
 }
 
-int run(){
+int main(){
 	int width = 800;
 	int height = 600;
 	std::string path = "/home/robert/Fractalbrot/test/test.png";
-	int iterations = 10000;
+	int iterations = 1000;
 
 	double Cr_c = -0.5;
 	double Cr_x = 1;
 	double Ci_c = 0;
 	double Ci_y = 1;
-	double Cscale = 2.0/1000.0;		// complex scale per calc unit
+	double Cscale = 2.0/800.0;		// complex scale per calc unit
 
 	int data [width*height];
 	for (int h=0; h<height; h++){
@@ -62,8 +61,4 @@ int run(){
 
 	printf("done\n");
 	return 0;
-}
-
-int main(){
-	return run();
 }
