@@ -11,22 +11,44 @@
 #include "functions_cuda.h"
 
 int main(){
-	int widthImg 	= 100;
+	int widthImg 	= 1000;
+	int widthSec	= 10;	// number of sectors on the same image (each sector: widthImg)
 	std::string path = "/home/robert/Fractalbrot/test/test.png";
-	int iterations 	= 10;
+	int iterations 	= 10000;
 	float widthC 	= 2.5;
 	float cenCr 	= 0.5;
 	float cenCi 	= 0.0;
-	bool buddha = true;
-
+	bool buddha = false;
 	if (not buddha){
-		int* data;
+		if (widthSec <= 1){
+			int* data;
 
-		data = sector_mandel(cenCr,cenCi,widthC,widthImg,iterations);
+			data = sector_mandel(cenCr,cenCi,widthC,widthImg,iterations);
 
-		exportImage(widthImg,widthImg,data,iterations,path);
+			exportImage(widthImg,widthImg,data,iterations,path);
 
-		free(data);
+			free(data);
+		}
+		else{
+			int* data = (int*)malloc(widthSec*widthSec*widthImg*widthImg*sizeof(int));
+			int* esc;
+			float cr, ci;
+			for (int h=0;h<widthSec;h++){
+				for (int w=0;w<widthSec;w++){
+					cr = cenCr-(w-widthSec/2.0+0.5)*widthC/(float)widthSec;
+					ci = cenCi-(h-widthSec/2.0+0.5)*widthC/(float)widthSec;
+					esc = sector_mandel(cr,ci,widthC/(float)widthSec,widthImg,iterations);
+					for (int H=0;H<widthImg;H++){
+						for (int W=0;W<widthImg;W++){
+							data[(h*widthImg+H)*widthSec*widthImg+w*widthImg+W] = esc[H*widthImg+W];
+						}
+					}
+					free(esc);
+				}
+			}
+			exportImage(widthImg*widthSec,widthImg*widthSec,data,iterations,path);
+			free(data);
+		}
 	}
 	else {
 		int* esc;
