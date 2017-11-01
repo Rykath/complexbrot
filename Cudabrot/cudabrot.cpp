@@ -22,10 +22,14 @@ int main(){
 	if (widthSec <= 1){
 		int* data;
 
-		data = sector_mandel(cenCr,cenCi,widthC,widthImg,iterations);
+//		data = sector_mandel(cenCr,cenCi,widthC,widthImg,iterations);
 //		data = sector_periodicity(cenCr,cenCi,widthC,widthImg,iterations,9,0.0005);
+		int maxVal;
+		int posIter = 3;
+		int escIter = 3;
+		data = sector_position(cenCr,cenCi,widthC,widthImg,posIter,escIter,&maxVal);
 
-		exportImage(widthImg,widthImg,data,iterations,path);
+		exportImage(widthImg,widthImg,data,maxVal,path);
 
 		free(data);
 	}
