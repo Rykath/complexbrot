@@ -22,8 +22,8 @@ int main(){
 	if (widthSec <= 1){
 		int* data;
 
-		//data = sector_mandel(cenCr,cenCi,widthC,widthImg,iterations);
-		data = sector_periodicity(cenCr,cenCi,widthC,widthImg,iterations,9,0.0005);
+		data = sector_mandel(cenCr,cenCi,widthC,widthImg,iterations);
+//		data = sector_periodicity(cenCr,cenCi,widthC,widthImg,iterations,9,0.0005);
 
 		exportImage(widthImg,widthImg,data,iterations,path);
 

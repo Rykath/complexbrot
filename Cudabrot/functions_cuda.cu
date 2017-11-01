@@ -15,7 +15,7 @@ __global__ void sequence_mandel(int* escIter, float* cr, float* ci, int maxIter)
 	float zr2 = 0;	// zr squared
 	float zi2 = 0;	// zi squared
 	
-	for (int iter=0; iter<maxIter; iter++){
+	for (int iter=1; iter<maxIter; iter++){
 		zi = 2*zi*zr + ci[pos]; // !! order is important, zi has to be first
 		zr = zr2 - zi2 + cr[pos];
 		zr2 = zr*zr;
@@ -78,7 +78,7 @@ __global__ void sequence_periodicity(int* perIter, float* cr, float* ci, int max
 	float pr = 0;	// checking periodicity against
 	float pi = 0;
 	
-	for (int iter=0; iter<maxIter; iter++){
+	for (int iter=1; iter<maxIter; iter++){
 		zi = 2*zi*zr + ci[pos]; // !! order is important, zi has to be first
 		zr = zr2 - zi2 + cr[pos];
 		zr2 = zr*zr;
@@ -149,7 +149,7 @@ __global__ void sequence_buddha(int* escIter, float* escPath, float* cr, float* 
 	float zr2 = 0;	// zr squared
 	float zi2 = 0;	// zi squared
 	
-	for (int iter=0; iter<maxIter; iter++){
+	for (int iter=1; iter<maxIter; iter++){
 		zi = 2*zi*zr + ci[pos]; // !! order is important, zi has to be first
 		zr = zr2 - zi2 + cr[pos];
 		zr2 = zr*zr;
