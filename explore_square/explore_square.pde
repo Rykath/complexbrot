@@ -2,7 +2,8 @@ double cenCr = 0.0;
 double cenCi = 0.0;
 double resC = 5.0/1000;
 
-int iter = 20;
+int iter = 2;
+int square = 8; // offset of square from mouse pointer in pixels
 
 PImage bgI;
 double Cr, Ci, Zr, Zi, Zr2, Zi2, Zr3, Zi3;
@@ -17,19 +18,84 @@ void draw(){
   image(bgI,0,0);
   
   // mouse-path
+  stroke(255,0,0);
+  drawPath(mouseX,mouseY);
+  
+  // mouse-path polar
+  stroke(0,255,0);
+  
   Cr = (mouseX-width/2.0)*resC+cenCr;
   Ci = (mouseY-height/2.0)*resC+cenCi;
-  Zr = 0;
-  Zi = 0;
+  
+  float Cl = sqrt((float)(Cr*Cr + Ci*Ci));
+  float Ca = atan2((float)Ci,(float)Cr);
+  
+  float Zl = 0;
+  float Za = 0;
+  float Zl2, Za2;
   
   for (int i=0;i<iter;i++){
-  stroke(255,(float)i/iter*255,(float)i/iter*255);
-  Zr2 = Zr*Zr - Zi*Zi + Cr;
-  Zi2 = 2*Zr*Zi + Ci;
-  lineCplx(Zr,Zi,Zr2,Zi2);
-  Zr = Zr2;
-  Zi = Zi2;
+    Zl2 = sqrt(pow(Zl,4) + pow(Cl,2) + 2*Cl*pow(Zl,2)*cos(2*Za-Ca));
+    Za2 = 2*Za + atan2(Cl*sin(Ca-2*Za),Zl*Zl+Cl*cos(Ca-2*Za));
+    lineCplx(Zl*cos(Za),Zl*sin(Za),Zl2*cos(Za2),Zl2*sin(Za2));
+    Zl = Zl2;
+    Za = Za2;
   }
+  
+  stroke(0,0,255);
+  fill(0,0,255);
+  Cr = (mouseX-width/2.0)*resC+cenCr;
+  Ci = (mouseY-height/2.0)*resC+cenCi;
+  Cl = sqrt((float)(Cr*Cr + Ci*Ci));
+  Ca = atan2((float)Ci,(float)Cr);
+  
+  circCplx(0,0,5);
+  circCplx(Cl*cos(Ca),Cl*sin(Ca),5);
+  circCplx(Cl*Cl*cos(2*Ca)+Cl*cos(Ca),Cl*Cl*sin(2*Ca)+Cl*sin(Ca),5);
+  
+  // ## draw path for square
+  //stroke(255,255,0);
+  //drawPath(mouseX+square,mouseY+square);
+  //stroke(255,0,255);
+  //drawPath(mouseX+square,mouseY-square);
+  //stroke(0,255,255);
+  //drawPath(mouseX-square,mouseY+square);
+  //stroke(255,100,100);
+  //drawPath(mouseX-square,mouseY-square);
+  
+  // ## draw square for each iter
+  //double[] aCr = new double[4];
+  //double[] aCi = new double[4];
+  //aCr[0] = (mouseX-width/2.0+square)*resC+cenCr;
+  //aCi[0] = (mouseY-height/2.0+square)*resC+cenCi;
+  //aCr[1] = (mouseX-width/2.0+square)*resC+cenCr;
+  //aCi[1] = (mouseY-width/2.0-square)*resC+cenCi;
+  //aCr[2] = (mouseX-width/2.0-square)*resC+cenCr;
+  //aCi[2] = (mouseY-width/2.0-square)*resC+cenCi;
+  //aCr[3] = (mouseX-width/2.0-square)*resC+cenCr;
+  //aCi[3] = (mouseY-width/2.0+square)*resC+cenCi;
+  //double[] aZr = new double[4];
+  //double[] aZi = new double[4];
+  //for (int i=0;i<4;i++){
+  //  aZr[i] = 0;
+  //  aZi[i] = 0;
+  //}
+  //for (int i=0;i<iter;i++){
+  //  for (int p=0;p<4;p++){
+  //    Zr2 = aZr[p]*aZr[p] - aZi[p]*aZi[p] + aCr[p];
+  //    Zi2 = 2*aZr[p]*aZi[p] + aCi[p];
+  //    aZr[p] = Zr2;
+  //    aZi[p] = Zi2;
+  //  }
+  //  stroke(255,0,0);
+  //  lineCplx(aZr[0],aZi[0],aZr[1],aZi[1]);
+  //  stroke(255,50,50);
+  //  lineCplx(aZr[1],aZi[1],aZr[2],aZi[2]);
+  //  stroke(255,100,100);
+  //  lineCplx(aZr[2],aZi[2],aZr[3],aZi[3]);
+  //  stroke(255,150,150);
+  //  lineCplx(aZr[3],aZi[3],aZr[0],aZi[0]);
+  //}
   
   // escape - targets
   //stroke(255,150,0);
@@ -59,7 +125,6 @@ void draw(){
   //  }
   //}
   //}
-      
   
   // grid
   stroke(0,0,255);
@@ -118,4 +183,18 @@ void circCplx(double xr, double xi, int r){
 
 void ellipseCplx(double xr, double xi, double w, double h){
   ellipse((int)((xr+cenCr)/resC+width/2.0),(int)((xi+cenCi)/resC+height/2.0),(int)(w/resC),(int)(h/resC));
+}
+
+void drawPath(int x, int y){
+  Cr = (x-width/2.0)*resC+cenCr;
+  Ci = (y-height/2.0)*resC+cenCi;
+  Zr = 0;
+  Zi = 0;
+  for (int i=0;i<iter;i++){
+    Zr2 = Zr*Zr - Zi*Zi + Cr;
+    Zi2 = 2*Zr*Zi + Ci;
+    lineCplx(Zr,Zi,Zr2,Zi2);
+    Zr = Zr2;
+    Zi = Zi2;
+  }
 }
